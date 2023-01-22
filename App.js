@@ -51,7 +51,7 @@ export default function App() {
               fontSize: 20,
             }}
           >
-            you have to please register
+            you have to please register!
           </Text>
           <TextInput
             style={styles.input}
