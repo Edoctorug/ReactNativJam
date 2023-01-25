@@ -2,6 +2,7 @@
 The app is for an online hospital EdoctorUg.
 
 #The following dependencies are installed for it's development.
+
 ├──@babel/core@7.20.12
 ├── @react-native-community/hooks@2.8.1
 ├── expo-status-bar@1.4.2
