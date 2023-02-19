@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 import {
   StyleSheet,
@@ -9,20 +9,19 @@ import {
   Text,
   TouchableOpacity,
   Platform,
+  Button,
+  ScrollView,
 } from "react-native";
 
-import { Dropdown } from 'react-native-element-dropdown';
-
+import { Dropdown } from "react-native-element-dropdown";
+import * as DocumentPicker from 'expo-document-picker';
 
 const data = [
-  { label: 'Patient', value: 'patient' },
-  { label: 'Hospital', value: 'hospital' },
-  { label: 'Doctor', value: 'Doctor' },
-  { label: 'Midwife', value: 'Midwife' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
+  { label: "Patiient", value: "patient" },
+  { label: "Hospital", value: "hospital" },
+  { label: "Doctor", value: "Doctor" },
+  { label: "Midwife", value: "Midwife" },
+  { label: "Clinic", value: "Clinic" },
 ];
 
 export default function App() {
@@ -35,13 +34,33 @@ export default function App() {
 
   const handleSign = () => alert("Registered!");
 
+  const _pickDocument = async () => {
+
+    let result = await DocumentPicker.getDocumentAsync({});
+
+    alert(result.uri);
+
+    console.log(result);
+
+  }
+
   const [value, setValue] = React.useState(null);
   const [isFocus, setIsFocus] = React.useState(false);
 
   return (
-    
-      <SafeAreaView style = {{paddingTop: Platform.OS === "android" ? 20 : 0, backgroundColor: "#0055C1"}}>
-        <ImageBackground source={require("./app/assets/edocbg.jpg")} resizeMode="cover">
+    <SafeAreaView
+      style={{
+        paddingTop: Platform.OS === "android" ? 20 : 0,
+        backgroundColor: "#0055C1",
+        flex: 1,
+      }}
+    >
+      <ScrollView>
+
+      <ImageBackground
+        source={require("./app/assets/edocbg.jpg")}
+        resizeMode="cover"
+      >
         <View style={styles.container}>
           <Text
             style={{
@@ -70,7 +89,7 @@ export default function App() {
               textAlign: "center",
               fontSize: 20,
             }}
-            >
+          >
             you have to please register!
           </Text>
           <TextInput
@@ -83,29 +102,32 @@ export default function App() {
             onChangeText={onChangeLname}
             value={lname}
           />
-            <View style={styles.containerDropDown}>
-      <Dropdown
-        style={[styles.input, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={!isFocus ? 'Select type' : '...'}
-        searchPlaceholder="Search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={item => {
-          setValue(item.value);
-          setIsFocus(false);
-        }}
-      />
-    </View>
+          <View style={styles.containerDropDown}>
+            <Dropdown
+              style={[styles.input, isFocus && { borderColor: "blue" }]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={data}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isFocus ? "Select type" : "..."}
+              searchPlaceholder="Search..."
+              value={value}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={(item) => {
+                setValue(item.value);
+                setIsFocus(false);
+              }}
+            />
+          </View>
+          <TouchableOpacity style={[styles.input]} onPress={_pickDocument}>
+            <Text>Attachments...</Text>
+          </TouchableOpacity>
           <TextInput
             style={[styles.input]}
             onChangeText={onChangeEmail}
@@ -137,9 +159,10 @@ export default function App() {
             </Text>
           </TouchableOpacity>
         </View>
-        </ImageBackground>
-      </SafeAreaView>
-    
+      </ImageBackground>
+      </ScrollView>
+      
+    </SafeAreaView>
   );
 }
 
@@ -167,7 +190,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     alignItems: "center",
-    
   },
   container2: {
     backgroundColor: "#ffff",
@@ -191,12 +213,11 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   containerDropDown: {
-
     fontSize: "bold",
   },
   dropdown: {
     height: 50,
-    borderColor: 'white',
+    borderColor: "white",
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
@@ -207,8 +228,8 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   label: {
-    position: 'absolute',
-    backgroundColor: 'white',
+    position: "absolute",
+    backgroundColor: "white",
     left: 22,
     top: 8,
     zIndex: 999,
