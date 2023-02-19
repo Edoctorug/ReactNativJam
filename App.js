@@ -10,10 +10,11 @@ import {
   TouchableOpacity,
   Platform,
   Button,
+  ScrollView,
 } from "react-native";
 
 import { Dropdown } from "react-native-element-dropdown";
-import DocumentPicker, { types } from "react-native-document-picker";
+import * as DocumentPicker from 'expo-document-picker';
 
 const data = [
   { label: "Patiient", value: "patient" },
@@ -33,32 +34,29 @@ export default function App() {
 
   const handleSign = () => alert("Registered!");
 
+  const _pickDocument = async () => {
+
+    let result = await DocumentPicker.getDocumentAsync({});
+
+    alert(result.uri);
+
+    console.log(result);
+
+  }
+
   const [value, setValue] = React.useState(null);
   const [isFocus, setIsFocus] = React.useState(false);
-
-  const [fileResponse, setFileResponse] = useState([]);
-
-  const handleDocumentSelection = useCallback(async () => {
-    try {
-      const response = await DocumentPicker.pickMultiple({
-        presentationStyle: "fullScreen",
-        type: [types.pdf],
-        allowMultiSelection: true,
-      });
-      setFileResponse(response);
-    } catch (err) {
-      console.log("There is an error\n");
-      console.warn(err);
-    }
-  }, []);
 
   return (
     <SafeAreaView
       style={{
         paddingTop: Platform.OS === "android" ? 20 : 0,
         backgroundColor: "#0055C1",
+        flex: 1,
       }}
     >
+      <ScrollView>
+
       <ImageBackground
         source={require("./app/assets/edocbg.jpg")}
         resizeMode="cover"
@@ -127,23 +125,9 @@ export default function App() {
               }}
             />
           </View>
-          {fileResponse.map((file, index) => (
-            <Text
-              key={index.toString()}
-              style={styles.uri}
-              numberOfLines={1}
-              ellipsizeMode={"middle"}
-            >
-              {file?.uri}
-            </Text>
-          ))}
-          <Button
-            style={{
-              with: 300
-            }}
-            title="Select Certificate"
-            onPress={handleDocumentSelection}
-          />
+          <TouchableOpacity style={[styles.input]} onPress={_pickDocument}>
+            <Text>Attachments...</Text>
+          </TouchableOpacity>
           <TextInput
             style={[styles.input]}
             onChangeText={onChangeEmail}
@@ -176,6 +160,8 @@ export default function App() {
           </TouchableOpacity>
         </View>
       </ImageBackground>
+      </ScrollView>
+      
     </SafeAreaView>
   );
 }
