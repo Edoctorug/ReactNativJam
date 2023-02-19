@@ -1,5 +1,6 @@
 #EDOCTORUG
 The app is for an online hospital EdoctorUg.
+we used expo
 
 #The following dependencies are installed for it's development.
 
