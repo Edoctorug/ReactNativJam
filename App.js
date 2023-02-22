@@ -162,22 +162,35 @@ export default function App() {
               // value={email}
               placeholder="Email Adress"
             />
-            <View>
-            <View
-              // style={{
-              //   width: 100,
-              //   height: 60,
-              //   fontWeight: "bold",
-              //   color: "white",
-              //   textAlign: "center",
-              //   fontSize: 20,
-              //   marginRight: 200,  
-              //   borderWidth: 1,
-              //   borderRadius: 20,
-              // }}
-            >
+            <View style={{
+              margin: 8,
+              borderBottomWidth: 2,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
+              borderColor: "white",
+    
+              borderBottomLeftRadius: 6,
+              borderBottomRightRadius: 60,
+              
+            }}>
               <PhoneInput
                 // style={styles.phone}
+                containerStyle ={{
+                  width: 200,
+                  backgroundColor: null,
+
+                  
+                }}
+                flagButtonStyle={{
+                  width: 45,
+                  
+
+                }}
+                textContainerStyle={{
+                  backgroundColor: null,
+                  fontWeight: "bold",
+
+                }}
                 useRef={phoneInput}
                 defaultValue={valuecountry}
                 defaultCode="UG"
@@ -189,11 +202,9 @@ export default function App() {
                 onChangeFormattedText={(text) => {
                   setFormattedValue(text);
                 }}
-                autoFocus
-                withShadow
+              
+                
               />
-            </View>
-
             </View>
             
             <TextInput
