@@ -58,6 +58,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'edoctorugAPI.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -77,8 +78,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'edoctorugAPI.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+
+# define database implementation
 
 DATABASES = {
        'default': {  
