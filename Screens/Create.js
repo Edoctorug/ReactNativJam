@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 
 import { Dropdown } from "react-native-element-dropdown";
@@ -26,33 +27,33 @@ const data = [
   { label: "Clinic", value: "clinic" },
 ];
 
-export default function App() {
-  const [fname, setFname] = React.useState("First Name");
-  const [lname, setLname] = React.useState("Second Name");
-  const [email, setEmail] = React.useState("Email");
-  const [phone, setPhone] = React.useState("Phone Number");
-  const [password, setPassword] = React.useState("Password");
-  const [cpassword, setPassword2] = React.useState("Password");
+function Create() {
+  const [fname, setFname] = React.useState("");
+  const [lname, setLname] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [cpassword, setPassword2] = React.useState("");
 
   const handleSign = () => alert("Registered!");
 
   const _pickPhamaLiecence = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+    let PharmaceauticalLicence = await DocumentPicker.getDocumentAsync({});
 
-    alert(result.uri);
+    alert(PharmaceauticalLicence.uri);
 
-    console.log(result);
+    console.log(PharmaceauticalLicence);
   };
 
   const _pickOperationLiecence = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+    let OperatingLicence = await DocumentPicker.getDocumentAsync({});
 
-    alert(result.uri);
+    alert(OperatingLicence.uri);
 
-    console.log(result);
+    console.log(OperatingLicence);
   };
 
   const [value, setValue] = React.useState(null);
+  const [number, setNumber] = React.useState(null);
   const [isFocus, setIsFocus] = React.useState(false);
 
   const [valuecountry, setValuecountry] = useState("");
@@ -60,6 +61,37 @@ export default function App() {
   const [valid, setValid] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const phoneInput = useRef < PhoneInput > null;
+
+
+
+  const formData = {
+    firstname: fname,
+    lastname: lname,
+    email: email,
+    password1: password,
+    role : value,
+    password2: cpassword,
+    phonenumber: number,
+
+
+  };
+
+  const InsertData = () =>{
+    fetch("http://192.168.248.1:900/signup/accounts/", { //used an ip address which is not localhost because localhost was conflicting with the android simulator...No conflicts surface wgen testing on ios emulators. 
+        method: "POST", //point to our url of the api with a get method (to get the accounts)
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+      .then(resp => resp.json()) //receive response then convert it to json. Since it returns a promise.
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => Alert.alert("Error", error)) //Catch the error and display it.
+    
+  
+  }
 
   return (
     <SafeAreaView
@@ -71,7 +103,7 @@ export default function App() {
     >
       <ScrollView>
         <ImageBackground
-          source={require("./app/assets/edocbg.jpg")}
+          source={require("../app/assets/edocbg.jpg")}
           resizeMode="cover"
         >
           <View style={styles.container}>
@@ -107,14 +139,14 @@ export default function App() {
             </Text>
             <TextInput
               style={styles.input}
-              onChangeText={setFname}
-              // value={fname}
+              onChangeText={fname => setFname(fname)}
+              value={fname}
               placeholder="First Name"
             />
             <TextInput
               style={styles.input}
               onChangeText={setLname}
-              // value={lname}
+              value={lname}
               placeholder="Last Name"
             />
 
@@ -159,47 +191,58 @@ export default function App() {
             <TextInput
               style={[styles.input]}
               onChangeText={setEmail}
-              // value={email}
+              value={email}
               placeholder="Email Adress"
             />
-            <View>
-            <View
-              // style={{
-              //   width: 100,
-              //   height: 60,
-              //   fontWeight: "bold",
-              //   color: "white",
-              //   textAlign: "center",
-              //   fontSize: 20,
-              //   marginRight: 200,  
-              //   borderWidth: 1,
-              //   borderRadius: 20,
-              // }}
-            >
+            <View style={{
+              margin: 8,
+              borderBottomWidth: 2,
+              borderLeftWidth: 1,
+              borderRightWidth: 1,
+              borderColor: "white",
+    
+              borderBottomLeftRadius: 6,
+              borderBottomRightRadius: 60,
+              
+            }}>
               <PhoneInput
                 // style={styles.phone}
+                containerStyle ={{
+                  width: 200,
+                  backgroundColor: null,
+
+                  
+                }}
+                flagButtonStyle={{
+                  width: 45,
+                  
+
+                }}
+                textContainerStyle={{
+                  backgroundColor: null,
+                  fontWeight: "bold",
+
+                }}
                 useRef={phoneInput}
                 defaultValue={valuecountry}
                 defaultCode="UG"
                 layout="first"
                 placeholder="700000000"
                 onChangeText={(text) => {
-                  setValue(text);
+                    setNumber(text);
                 }}
                 onChangeFormattedText={(text) => {
                   setFormattedValue(text);
                 }}
-                autoFocus
-                withShadow
+              
+                
               />
-            </View>
-
             </View>
             
             <TextInput
               style={styles.input}
               onChangeText={setPassword}
-              // value={password}
+              value={password}
               placeholder="Password"
               secureTextEntry={true}
               textContentType="oneTimeCode"
@@ -207,13 +250,13 @@ export default function App() {
             <TextInput
               style={styles.input}
               onChangeText={setPassword2}
-              // value={cpassword}
+              value={cpassword}
               placeholder="Re-Enter Password"
               secureTextEntry={true}
               textContentType="oneTimeCode"
             />
             <TouchableOpacity>
-              <Text style={styles.sign} onPress={handleSign}>
+              <Text style={styles.sign} onPress={InsertData}>
                 SignUp
               </Text>
             </TouchableOpacity>
@@ -223,6 +266,8 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+export default Create;
 
 const styles = StyleSheet.create({
   input: {
