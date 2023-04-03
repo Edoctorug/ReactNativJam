@@ -28,7 +28,6 @@ const data = [
 ];
 
 function Create() {
-
   //useStates below are for managing/handling change in the values of variables forexample 'fname' changed with the function 'setFname'. They keep refreshing under the hood once the function is called.
   const [fname, setFname] = React.useState("");
   const [lname, setLname] = React.useState("");
@@ -36,18 +35,18 @@ function Create() {
   const [password, setPassword] = React.useState("");
   const [cpassword, setPassword2] = React.useState("");
   const [pharmlicence, setPharmlicence] = React.useState(null);
-  const [operationLicence, setOperationLicence] = React.useState(null); 
+  const [operationLicence, setOperationLicence] = React.useState(null);
 
   // function to be called when the Pharmaceautical Licence button is clicked. It then waits the document details to store them in variable 'PharmaceauticalLicence1' which is later used to change state of 'pharmlicence'
   const _pickPhamaLiecence = async () => {
     let PharmaceauticalLicence1 = await DocumentPicker.getDocumentAsync({});
-    setPharmlicence(PharmaceauticalLicence1)
+    setPharmlicence(PharmaceauticalLicence1);
   };
 
-    // function to be called when the Operating Licence button is clicked. It then waits the document details to store them in variable 'OperatingLicence' which is later used to change state of 'operationLicence'
+  // function to be called when the Operating Licence button is clicked. It then waits the document details to store them in variable 'OperatingLicence' which is later used to change state of 'operationLicence'
   const _pickOperationLiecence = async () => {
     let OperatingLicence = await DocumentPicker.getDocumentAsync({});
-    setOperationLicence(OperatingLicence)
+    setOperationLicence(OperatingLicence);
   };
 
   //these handle country code assignments.
@@ -61,7 +60,6 @@ function Create() {
   const [showMessage, setShowMessage] = useState(false);
   const phoneInput = useRef < PhoneInput > null;
 
-
   //We use formData to pass it to our InsertData() function in the content-type since we want to include some form data [pdfs]
   const formData = new FormData();
   formData.append("firstname", fname);
@@ -73,21 +71,26 @@ function Create() {
   formData.append("phonenumber", number);
 
   //check if the licences are really attached before sending them to backend, we wouldn't like to send invalid files. What to be done incase of invalid values can be done later with developments.
-  if (pharmlicence != null){
-    formData.append("pharmaceaticallicence", {uri: pharmlicence.uri, name: pharmlicence.name, type: 'application/pdf'});
+  if (pharmlicence != null) {
+    formData.append("pharmaceaticallicence", {
+      uri: pharmlicence.uri,
+      name: pharmlicence.name,
+      type: "application/pdf",
+    });
   }
-  if (operationLicence != null){
-    formData.append("operatinglicence", {uri: operationLicence.uri, name: operationLicence.name, type: 'application/pdf'});
+  if (operationLicence != null) {
+    formData.append("operatinglicence", {
+      uri: operationLicence.uri,
+      name: operationLicence.name,
+      type: "application/pdf",
+    });
   }
-   
-
 
   const InsertData = () => {
     fetch("http://192.168.248.1:900/signup/accounts/", {
       //used an ip address which is not localhost because localhost was conflicting with the android simulator...No conflicts surface wgen testing on ios emulators.
       method: "POST", //point to our url of the api with a get method (to get the accounts)
       headers: {
-
         "Content-Type": "multipart/form-data",
       },
       body: formData,
@@ -104,14 +107,17 @@ function Create() {
     <SafeAreaView
       style={{
         paddingTop: Platform.OS === "android" ? 20 : 0,
-        backgroundColor: "#0055C1",
+        backgroundColor: "#5CC5FF",
         flex: 1,
       }}
     >
       <ScrollView>
-        <ImageBackground
-          source={require("../app/assets/edocbg.jpg")}
-          resizeMode="cover"
+        <View
+          style={{
+            backgroundColor: "#5CC5FF",
+          }}
+          // source={require("../app/assets/edocbg.jpg")}
+          // resizeMode="cover"
         >
           <View style={styles.container}>
             <Text
@@ -119,7 +125,7 @@ function Create() {
                 fontWeight: "bold",
                 color: "white",
                 textAlign: "center",
-                fontSize: 60,
+                fontSize: 40,
               }}
             >
               Sign-Up
@@ -203,28 +209,35 @@ function Create() {
             />
             <View
               style={{
-                margin: 8,
-                borderBottomWidth: 2,
-                borderLeftWidth: 1,
-                borderRightWidth: 1,
+                margin: 0,
+                // borderBottomWidth: 2,
+                // borderLeftWidth: 1,
+                // borderRightWidth: 1,
                 borderColor: "white",
+                height: 50,
+                width: 300,
+                margin: 0,
+                borderRadius: 50,
 
-                borderBottomLeftRadius: 6,
-                borderBottomRightRadius: 60,
+                // borderBottomLeftRadius: 6,
+                // borderBottomRightRadius: 60,
               }}
             >
               <PhoneInput
                 // style={styles.phone}
                 containerStyle={{
-                  width: 200,
-                  backgroundColor: null,
+                  backgroundColor: "white",
+                  borderRadius: 50,
+                  width: 300,
                 }}
                 flagButtonStyle={{
-                  width: 45,
+                  // width: 45,
+                  marginLeft: 8,
                 }}
                 textContainerStyle={{
-                  backgroundColor: null,
-                  fontWeight: "bold",
+                  backgroundColor: "white",
+                  fontWeight: "normal",
+                  borderRadius: 50,
                 }}
                 useRef={phoneInput}
                 defaultValue={valuecountry}
@@ -262,7 +275,7 @@ function Create() {
               </Text>
             </TouchableOpacity>
           </View>
-        </ImageBackground>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -273,30 +286,35 @@ export default Create;
 const styles = StyleSheet.create({
   input: {
     fontWeight: "bold",
-    height: 40,
-    width: 200,
+    height: 50,
+    width: 300,
     margin: 8,
-    borderBottomWidth: 2,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: "white",
+    // borderBottomWidth: 2,
+    // borderLeftWidth: 1,
+    // borderRightWidth: 1,
+    // borderColor: "white",
     padding: 11,
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 60,
+    borderRadius: 50,
+    backgroundColor: "white",
+
+    // borderBottomLeftRadius: 6,
+    // borderBottomRightRadius: 60,
   },
   attachment: {
     fontWeight: "bold",
-    height: 40,
-    width: 200,
+    height: 50,
+    width: 300,
     margin: 3,
-    borderBottomWidth: 2,
-    borderLeftWidth: 0.5,
-    borderRightWidth: 0.5,
-    borderTopWidth: 0.5,
-    borderColor: "white",
+    // borderBottomWidth: 2,
+    // borderLeftWidth: 0.5,
+    // borderRightWidth: 0.5,
+    // borderTopWidth: 0.5,
+    // borderColor: "white",
     padding: 11,
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 60,
+    borderRadius: 50,
+    backgroundColor: "white",
+    // borderBottomLeftRadius: 6,
+    // borderBottomRightRadius: 60,
   },
   image: {
     width: "100%",
@@ -318,17 +336,20 @@ const styles = StyleSheet.create({
     color: "white",
   },
   sign: {
-    fontWeight: "bold",
-    fontSize: 30,
+    fontWeight: "normal",
+    fontSize: 17,
     color: "black",
     backgroundColor: "#A1ECCB",
+    // display:"flex",
     textAlign: "center",
-    height: 60,
-    width: 200,
-    margin: 10,
-    padding: 11,
+    // justifyContent: "center",
+    textAlignVertical: "center",
+    height: 50,
+    width: 300,
+    margin: 0,
+    padding: 0,
 
-    borderRadius: 30,
+    borderRadius: 50,
   },
   containerDropDown: {
     fontSize: "bold",
