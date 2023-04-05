@@ -27,32 +27,30 @@ const data = [
   { label: "Clinic", value: "clinic" },
 ];
 
-function Create() {
+function Create({ navigation }) {
+  //useStates below are for managing/handling change in the values of variables forexample 'fname' changed with the function 'setFname'. They keep refreshing under the hood once the function is called.
   const [fname, setFname] = React.useState("");
   const [lname, setLname] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [cpassword, setPassword2] = React.useState("");
+  const [pharmlicence, setPharmlicence] = React.useState(null);
+  const [operationLicence, setOperationLicence] = React.useState(null);
 
-  const handleSign = () => alert("Registered!");
-
+  // function to be called when the Pharmaceautical Licence button is clicked. It then waits the document details to store them in variable 'PharmaceauticalLicence1' which is later used to change state of 'pharmlicence'
   const _pickPhamaLiecence = async () => {
-    let PharmaceauticalLicence = await DocumentPicker.getDocumentAsync({});
-
-    alert(PharmaceauticalLicence.uri);
-
-    console.log(PharmaceauticalLicence);
+    let PharmaceauticalLicence1 = await DocumentPicker.getDocumentAsync({});
+    setPharmlicence(PharmaceauticalLicence1);
   };
 
+  // function to be called when the Operating Licence button is clicked. It then waits the document details to store them in variable 'OperatingLicence' which is later used to change state of 'operationLicence'
   const _pickOperationLiecence = async () => {
     let OperatingLicence = await DocumentPicker.getDocumentAsync({});
-
-    alert(OperatingLicence.uri);
-
-    console.log(OperatingLicence);
+    setOperationLicence(OperatingLicence);
   };
 
-  const [value, setValue] = React.useState(null);
+  //these handle country code assignments.
+  const [value, setValue] = React.useState("Patient");
   const [number, setNumber] = React.useState(null);
   const [isFocus, setIsFocus] = React.useState(false);
 
@@ -62,49 +60,71 @@ function Create() {
   const [showMessage, setShowMessage] = useState(false);
   const phoneInput = useRef < PhoneInput > null;
 
+  //We use formData to pass it to our InsertData() function in the content-type since we want to include some form data [pdfs]
+  const formData = new FormData();
+  formData.append("firstname", fname);
+  formData.append("lastname", lname);
+  formData.append("email", email);
+  formData.append("password1", password);
+  formData.append("role", value);
+  formData.append("password2", cpassword);
+  formData.append("phonenumber", number);
 
-
-  const formData = {
-    firstname: fname,
-    lastname: lname,
-    email: email,
-    password1: password,
-    role : value,
-    password2: cpassword,
-    phonenumber: number,
-
-
-  };
-
-  const InsertData = () =>{
-    fetch("http://192.168.248.1:900/signup/accounts/", { //used an ip address which is not localhost because localhost was conflicting with the android simulator...No conflicts surface wgen testing on ios emulators. 
-        method: "POST", //point to our url of the api with a get method (to get the accounts)
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-      .then(resp => resp.json()) //receive response then convert it to json. Since it returns a promise.
-      .then(data => {
-        console.log(data)
-      })
-      .catch(error => Alert.alert("Error", error)) //Catch the error and display it.
-    
-  
+  //check if the licences are really attached before sending them to backend, we wouldn't like to send invalid files. What to be done incase of invalid values can be done later with developments.
+  if (pharmlicence != null) {
+    formData.append("pharmaceaticallicence", {
+      uri: pharmlicence.uri,
+      name: pharmlicence.name,
+      type: "application/pdf",
+    });
   }
+  if (operationLicence != null) {
+    formData.append("operatinglicence", {
+      uri: operationLicence.uri,
+      name: operationLicence.name,
+      type: "application/pdf",
+    });
+  }
+
+
+
+  const InsertData = () => {
+    fetch("http://192.168.248.1:900/signup/accounts/", {
+      //used an ip address which is not localhost because localhost was conflicting with the android simulator...No conflicts surface wgen testing on ios emulators.
+      method: "POST", //point to our url of the api with a get method (to get the accounts)
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      body: formData,
+    })
+      .then((resp) => resp.json()) //receive response then convert it to json. Since it returns a promise.
+      .then((data) => {
+        console.log(data); //uncomment this line to see the data returned in the response.
+        // alert("Account Registered Successfully.");
+        // console.log(dataToGoWith.role);
+        const role = data.role;
+        // console.log(role);
+        navigation.navigate('Signed', {role: String(role)});
+
+      })
+      .catch((error) => Alert.alert("Error", error)); //Catch the error and display it.
+  };
 
   return (
     <SafeAreaView
       style={{
         paddingTop: Platform.OS === "android" ? 20 : 0,
-        backgroundColor: "#0055C1",
+        backgroundColor: "#5CC5FF",
         flex: 1,
       }}
     >
       <ScrollView>
-        <ImageBackground
-          source={require("../app/assets/edocbg.jpg")}
-          resizeMode="cover"
+        <View
+          style={{
+            backgroundColor: "#5CC5FF",
+          }}
+          // source={require("../app/assets/edocbg.jpg")}
+          // resizeMode="cover"
         >
           <View style={styles.container}>
             <Text
@@ -112,7 +132,7 @@ function Create() {
                 fontWeight: "bold",
                 color: "white",
                 textAlign: "center",
-                fontSize: 60,
+                fontSize: 40,
               }}
             >
               Sign-Up
@@ -139,7 +159,7 @@ function Create() {
             </Text>
             <TextInput
               style={styles.input}
-              onChangeText={fname => setFname(fname)}
+              onChangeText={(fname) => setFname(fname)}
               value={fname}
               placeholder="First Name"
             />
@@ -176,7 +196,9 @@ function Create() {
             {(value === "clinic" ||
               value === "pharmacy" ||
               value === "hospital" ||
-              value === "hospital") && (
+              value === "hospital" ||
+              value === "doctor"
+              ) && (
               <>
                 <TouchableOpacity onPress={_pickPhamaLiecence}>
                   <Text style={[styles.attachment]}>
@@ -194,34 +216,37 @@ function Create() {
               value={email}
               placeholder="Email Adress"
             />
-            <View style={{
-              margin: 8,
-              borderBottomWidth: 2,
-              borderLeftWidth: 1,
-              borderRightWidth: 1,
-              borderColor: "white",
-    
-              borderBottomLeftRadius: 6,
-              borderBottomRightRadius: 60,
-              
-            }}>
+            <View
+              style={{
+                margin: 0,
+                // borderBottomWidth: 2,
+                // borderLeftWidth: 1,
+                // borderRightWidth: 1,
+                borderColor: "white",
+                height: 50,
+                width: 300,
+                margin: 0,
+                borderRadius: 50,
+
+                // borderBottomLeftRadius: 6,
+                // borderBottomRightRadius: 60,
+              }}
+            >
               <PhoneInput
                 // style={styles.phone}
-                containerStyle ={{
-                  width: 200,
-                  backgroundColor: null,
-
-                  
+                containerStyle={{
+                  backgroundColor: "white",
+                  borderRadius: 50,
+                  width: 300,
                 }}
                 flagButtonStyle={{
-                  width: 45,
-                  
-
+                  // width: 45,
+                  marginLeft: 8,
                 }}
                 textContainerStyle={{
-                  backgroundColor: null,
-                  fontWeight: "bold",
-
+                  backgroundColor: "white",
+                  fontWeight: "normal",
+                  borderRadius: 50,
                 }}
                 useRef={phoneInput}
                 defaultValue={valuecountry}
@@ -229,16 +254,14 @@ function Create() {
                 layout="first"
                 placeholder="700000000"
                 onChangeText={(text) => {
-                    setNumber(text);
+                  setNumber(text);
                 }}
                 onChangeFormattedText={(text) => {
                   setFormattedValue(text);
                 }}
-              
-                
               />
             </View>
-            
+
             <TextInput
               style={styles.input}
               onChangeText={setPassword}
@@ -261,7 +284,7 @@ function Create() {
               </Text>
             </TouchableOpacity>
           </View>
-        </ImageBackground>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -272,30 +295,35 @@ export default Create;
 const styles = StyleSheet.create({
   input: {
     fontWeight: "bold",
-    height: 40,
-    width: 200,
+    height: 50,
+    width: 300,
     margin: 8,
-    borderBottomWidth: 2,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: "white",
+    // borderBottomWidth: 2,
+    // borderLeftWidth: 1,
+    // borderRightWidth: 1,
+    // borderColor: "white",
     padding: 11,
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 60,
+    borderRadius: 50,
+    backgroundColor: "white",
+
+    // borderBottomLeftRadius: 6,
+    // borderBottomRightRadius: 60,
   },
   attachment: {
     fontWeight: "bold",
-    height: 40,
-    width: 200,
+    height: 50,
+    width: 300,
     margin: 3,
-    borderBottomWidth: 2,
-    borderLeftWidth: 0.5,
-    borderRightWidth: 0.5,
-    borderTopWidth: 0.5,
-    borderColor: "white",
+    // borderBottomWidth: 2,
+    // borderLeftWidth: 0.5,
+    // borderRightWidth: 0.5,
+    // borderTopWidth: 0.5,
+    // borderColor: "white",
     padding: 11,
-    borderBottomLeftRadius: 6,
-    borderBottomRightRadius: 60,
+    borderRadius: 50,
+    backgroundColor: "white",
+    // borderBottomLeftRadius: 6,
+    // borderBottomRightRadius: 60,
   },
   image: {
     width: "100%",
@@ -317,17 +345,20 @@ const styles = StyleSheet.create({
     color: "white",
   },
   sign: {
-    fontWeight: "bold",
-    fontSize: 30,
+    fontWeight: "normal",
+    fontSize: 17,
     color: "black",
     backgroundColor: "#A1ECCB",
+    // display:"flex",
     textAlign: "center",
-    height: 60,
-    width: 200,
-    margin: 10,
-    padding: 11,
+    // justifyContent: "center",
+    textAlignVertical: "center",
+    height: 50,
+    width: 300,
+    margin: 0,
+    padding: 0,
 
-    borderRadius: 30,
+    borderRadius: 50,
   },
   containerDropDown: {
     fontSize: "bold",
@@ -372,8 +403,8 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: "#000",
     marginBottom: 10,
-    color: '#000'
-},
+    color: "#000",
+  },
 });
