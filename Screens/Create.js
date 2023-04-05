@@ -27,7 +27,7 @@ const data = [
   { label: "Clinic", value: "clinic" },
 ];
 
-function Create() {
+function Create({ navigation }) {
   //useStates below are for managing/handling change in the values of variables forexample 'fname' changed with the function 'setFname'. They keep refreshing under the hood once the function is called.
   const [fname, setFname] = React.useState("");
   const [lname, setLname] = React.useState("");
@@ -50,7 +50,7 @@ function Create() {
   };
 
   //these handle country code assignments.
-  const [value, setValue] = React.useState(null);
+  const [value, setValue] = React.useState("Patient");
   const [number, setNumber] = React.useState(null);
   const [isFocus, setIsFocus] = React.useState(false);
 
@@ -86,6 +86,8 @@ function Create() {
     });
   }
 
+
+
   const InsertData = () => {
     fetch("http://192.168.248.1:900/signup/accounts/", {
       //used an ip address which is not localhost because localhost was conflicting with the android simulator...No conflicts surface wgen testing on ios emulators.
@@ -97,8 +99,13 @@ function Create() {
     })
       .then((resp) => resp.json()) //receive response then convert it to json. Since it returns a promise.
       .then((data) => {
-        // console.log(data); //uncomment this line to see the data returned in the response.
-        alert("Account Registered Successfully.");
+        console.log(data); //uncomment this line to see the data returned in the response.
+        // alert("Account Registered Successfully.");
+        // console.log(dataToGoWith.role);
+        const role = data.role;
+        // console.log(role);
+        navigation.navigate('Signed', {role: String(role)});
+
       })
       .catch((error) => Alert.alert("Error", error)); //Catch the error and display it.
   };
@@ -189,7 +196,9 @@ function Create() {
             {(value === "clinic" ||
               value === "pharmacy" ||
               value === "hospital" ||
-              value === "hospital") && (
+              value === "hospital" ||
+              value === "doctor"
+              ) && (
               <>
                 <TouchableOpacity onPress={_pickPhamaLiecence}>
                   <Text style={[styles.attachment]}>
